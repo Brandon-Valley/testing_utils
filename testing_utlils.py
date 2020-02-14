@@ -1,75 +1,48 @@
-''' [======- - - - -=================- All Utilities Standard -=================- - - - -======] '''
-# to allow for relative imports
-import sys, os
-sys.path.insert(1, os.path.join(sys.path[0], os.path.dirname(os.path.abspath(__file__))))
-''' [======- - - - - - -=============- - - - -========- - - - -=============- - - - - - -======] '''
+''' -- VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV -- All Utilities Standard Header -- VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV -- '''
+import sys, os    ;     sys.path.insert(1, os.path.join(sys.path[0], os.path.dirname(os.path.abspath(__file__)))) # to allow for relative imports, delete any imports under this line
 
-# print('sys_path:  ', sys.path)#`````````````````````````````````````````````````````````````````````````````````````
-og_sys_path = sys.path
-sys.path = [os.path.join(sys.path[0], os.path.dirname(os.path.abspath(__file__)))]
+util_submodule_l = ['exception_utils', 'txt_logger'] # list of all imports from local util_submodules that could be imported elsewhere to temporarily remove from sys.modules
 
-print('sys_path: ', sys.path)#````````````````````````````````````````````````````````````````````````````````````````````)
+# temporarily remove any modules that could conflict with this file's local util_submodule imports
+og_sys_modules = sys.modules    ;    pop_l = [] # save the original sys.modules to be restored at the end of this file
+for module_descrip in sys.modules.keys():  
+    if any( util_submodule in module_descrip for util_submodule in util_submodule_l )    :    pop_l.append(module_descrip) # add any module that could conflict local util_submodule imports to list to be removed from sys.modules temporarily
+for module_descrip in pop_l    :    sys.modules.pop(module_descrip) # remove all modules put in pop list from sys.modules
+util_submodule_import_check_count = 0 # count to make sure you don't add a local util_submodule import without adding it to util_submodule_l
 
-for path in og_sys_path:
-#     if any(elm in path for elm in ['\\Python\\Python', '\\eclipse\\plugins\\']):
-    if '\\Python\\Python' in path or '\\eclipse\\plugins\\' in path:
-        sys.path.append(path)
-        print('just added to sys.path:  ', path)
-        
-        
-        
-# print('sys_path: ', sys.path)#````````````````````````````````````````````````````````````````````````````````````````````)
-print('before imports:\n[')
-for path in sys.path:
-    print('  ', path)
-print(']')
+''' -- VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV -- All Utilities Standard: Local Utility Submodule Imports  -- VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV -- '''
 
-# print('setting testing utils as cwd')
-# import os
-# os.chdir(os.path.dirname(os.path.abspath(__file__)))
-        
-from util_submodules.logger import txt_logger 
-# from util_submodules.logger import logger 
-from util_submodules.logger import test_import
-from test_submodules.test_module_dir import test_module
-from util_submodules.exception_utils import exception_utils as eu
-from util_submodules.exception_utils import exception_utils
-
-
-# print('sys_path: ', sys.path)#````````````````````````````````````````````````````````````````````````````````````````````)
-print('after imports:\n[')
-for path in sys.path:
-    print('  ', path)
-print(']')
-
-
-print('test_import.TEST_VAR: ', test_import.TEST_VAR)
-
-# eu.error_if_param_invalid('THIS SHOULD RAISE ERROR', ['overwrite', 'append'])
-
-# sys.path = og_sys_path
-
-# eu.error_if_param_invalid('THIS SHOULD RAISE ERROR', ['overwrite', 'append'])
-
-
-#         tu.print_me(proj_ver_change_dl, title = commit.abrv_commit_hash, to_file = 'multi_ver_commits.txt', to_file_write_mode = 'append')
+from util_submodules .exception_utils import exception_utils as eu    ; util_submodule_import_check_count += 1 
+from util_submodules .logger          import txt_logger               ; util_submodule_import_check_count += 1 
+    
+''' ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ '''
+if util_submodule_import_check_count != len(util_submodule_l)    :    raise Exception("ERROR:  You probably added a local util_submodule import without adding it to the util_submodule_l")
+''' ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ '''
 
 
 import json
-    
+
+
+
     
 # Full Pretty Print
-def fp_print(obj, title = None, log_file_path = None, log_write_mode = 'overwrite', print_indent = 0, json_indent = 4, print_output = True):
-    eu.error_if_param_invalid(log_write_mode, ['overwrite', 'append'])
-    
-    print(sys.path)#```````````````````````````````````````````````````````````````````````````````````````````)
+# if no title given, obj_from_title_indent set to 0
+def fp_print(obj, title = None, log_file_path = None, log_write_mode = 'overwrite', print_indent = 0, obj_from_title_indent = 0, json_indent = 4, print_output = True):
+    eu.error_if_param_type_not_in_whitelist( title                  , ['NoneType', 'str'])
+    eu.error_if_param_type_not_in_whitelist( log_file_path          , ['NoneType', 'str'])
+    eu.error_if_param_key_not_in_whitelist ( log_write_mode         , ['overwrite', 'append'])    
+    eu.error_if_param_type_not_in_whitelist( print_indent           , ['int'])
+    eu.error_if_param_type_not_in_whitelist( obj_from_title_indent  , ['int'])
+    eu.error_if_param_type_not_in_whitelist( json_indent            , ['int'])
+    eu.error_if_param_type_not_in_whitelist( print_output           , ['bool'])
     eu.error_if_forbidden_param_val_combo({log_file_path : None, print_output : False}, reason = "If you arn't logging or printing, this function does nothing")
-#     if log_file_path == None and print_output == False:
-#         raise eu.IncompatibleParamsError("")
     
     
-    print_indent_str = ' ' * print_indent
+    if title == None:
+        obj_from_title_indent = 0
     
+    print_indent_str          = ' ' * print_indent
+    obj_from_title_indent_str = ' ' * obj_from_title_indent
     
     out_str = ''
     
@@ -80,31 +53,108 @@ def fp_print(obj, title = None, log_file_path = None, log_write_mode = 'overwrit
     dump_line_l = dump.split('\n')
     
     for line in dump_line_l:
-        out_str += print_indent_str + line + '\n'
+        out_str += print_indent_str + obj_from_title_indent_str + line + '\n'
         
     if log_file_path != None:
-        txt_logger.write(out_str, log_file_path, write_mode = 'overwrite')
+        txt_logger.write(out_str, log_file_path, write_mode = log_write_mode)
+        
+    if print_output:
+        print(out_str)
+        
         
       
+''' VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV '''
+'''                                                                           
+        Simple Functions For Quick Auto-Complete
+'''
+''' VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV '''
+    
+# prefix order: i, t, m
+
+# prints
+def p_print  (obj)                : fp_print(obj, json_indent = 4) # Pretty Print
+def tp_print (obj, title)         : fp_print(obj, json_indent = 4, title = title, obj_from_title_indent = 4) # Titled Pretty Print
+def ip_print (obj,        indent) : fp_print(obj, json_indent = 4, print_indent = indent) # Indented Pretty Print
+def itp_print(obj, title, indent) : fp_print(obj, json_indent = 4, title = title, obj_from_title_indent = 4, print_indent = indent) # Indented Titled Pretty Print
+
+# logs
+def o_log   (obj,                     log_file_path):              fp_print(obj, json_indent = 4, log_file_path = log_file_path, log_write_mode = 'overwrite', print_output = False) # Overwrite Log
+def a_log   (obj,                     log_file_path):              fp_print(obj, json_indent = 4, log_file_path = log_file_path, log_write_mode = 'append'   , print_output = False) # Append Log
+                                                                   
+def to_log  (obj,      title,         log_file_path):              fp_print(obj, json_indent = 4, log_file_path = log_file_path, log_write_mode = 'overwrite', print_output = False, obj_from_title_indent = 4, title = title) # Titled Overwrite Log
+def ta_log  (obj,      title,         log_file_path):              fp_print(obj, json_indent = 4, log_file_path = log_file_path, log_write_mode = 'append'   , print_output = False, obj_from_title_indent = 4, title = title) # Titled Append Log
+                                                                   
+def io_log  (obj,             indent, log_file_path):              fp_print(obj, json_indent = 4, log_file_path = log_file_path, log_write_mode = 'overwrite', print_output = False, obj_from_title_indent = 4, print_indent = indent) 
+def ia_log  (obj,             indent, log_file_path):              fp_print(obj, json_indent = 4, log_file_path = log_file_path, log_write_mode = 'append'   , print_output = False, obj_from_title_indent = 4, print_indent = indent) 
+                                                                   
+def ito_log (obj,      title, indent, log_file_path):              fp_print(obj, json_indent = 4, log_file_path = log_file_path, log_write_mode = 'overwrite', print_output = False, obj_from_title_indent = 4, title = title, print_indent = indent) 
+def ita_log (obj,      title, indent, log_file_path):              fp_print(obj, json_indent = 4, log_file_path = log_file_path, log_write_mode = 'append'   , print_output = False, obj_from_title_indent = 4, title = title, print_indent = indent) 
+
+# logs that print a given message 
+def mo_log  (obj, msg,                log_file_path): print(msg) ; fp_print(obj, json_indent = 4, log_file_path = log_file_path, log_write_mode = 'overwrite', print_output = False) # Message Overwrite Log
+def ma_log  (obj, msg,                log_file_path): print(msg) ; fp_print(obj, json_indent = 4, log_file_path = log_file_path, log_write_mode = 'append'   , print_output = False) # Message Append Log
+
+def mto_log (obj, msg, title,         log_file_path): print(msg) ; fp_print(obj, json_indent = 4, log_file_path = log_file_path, log_write_mode = 'overwrite', print_output = False, obj_from_title_indent = 4, title = title) # Titled Overwrite Log
+def mta_log (obj, msg, title,         log_file_path): print(msg) ; fp_print(obj, json_indent = 4, log_file_path = log_file_path, log_write_mode = 'append'   , print_output = False, obj_from_title_indent = 4, title = title) # Titled Append Log
+                                                      
+def mio_log (obj, msg,        indent, log_file_path): print(msg) ; fp_print(obj, json_indent = 4, log_file_path = log_file_path, log_write_mode = 'overwrite', print_output = False, obj_from_title_indent = 4, print_indent = indent) 
+def mia_log (obj, msg,        indent, log_file_path): print(msg) ; fp_print(obj, json_indent = 4, log_file_path = log_file_path, log_write_mode = 'append'   , print_output = False, obj_from_title_indent = 4, print_indent = indent) 
+                                                       
+def mito_log(obj, msg, title, indent, log_file_path): print(msg) ; fp_print(obj, json_indent = 4, log_file_path = log_file_path, log_write_mode = 'overwrite', print_output = False, obj_from_title_indent = 4, title = title, print_indent = indent) 
+def mita_log(obj, msg, title, indent, log_file_path): print(msg) ; fp_print(obj, json_indent = 4, log_file_path = log_file_path, log_write_mode = 'append'   , print_output = False, obj_from_title_indent = 4, title = title, print_indent = indent) 
+
+
+
     
     
     
-# Pretty Print
-# keep this one simple for quick auto-complete
-def p_print(obj):
-    print(json.dumps(obj, indent = 4))
-#     fp_print(obj, json_indent = 4)
+    
+    
+    
+# DONT DELETE UNTIL TRY TO MAKE REFLECTION VAR PRINT FUNC !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# import inspect
+# # call from inside a function passing the name of the function as a str to get a 
+# # string describing the names and values of the functions parameters
+# def get_param_vals_str_of_last_func_call(func_name):
+# #         print(inspect.stack())#````````````````````````````````````````````````````````````````````````````
+#     s_stack = str(inspect.stack()).split(func_name)
+#     if len(s_stack) > 0:
+#         last_slice = s_stack[-1]
+# #         param_str = last_slice.split(',\n"index=')[0]
+#         param_str_with_backslash = last_slice.split("n'], index=")[0]
+#         param_str = param_str_with_backslash[1:-2]
+# #             param_str_l = list(param_str)
+# #         param_str = last_slice.split(")\n'], index=")[0]
+# #         param_str = last_slice.split("index=")[0]
+#         print('param_str: ', param_str)#```````````````````````````````````````````````````````````````````````````````````
+# #             print('param_str_l: ', param_str_l)#```````````````````````````````````````````````````````````````````````````````````
+#     return param_str
+# 
+#  
+# def gat_var_name(var):
+#         """
+#         Gets the name of var. Does it from the out most frame inner-wards.
+#         :param var: variable to get name from.
+#         :return: string
+#         """
+#         print('stack: ', inspect.stack())
+#         for fi in reversed(inspect.stack()):
+#             names = [var_name for var_name, var_val in fi.frame.f_locals.items() if var_val is var]
+#             if len(names) > 0:
+#                 return names[0]
     
     
     
     
-    
-sys.path = og_sys_path 
+''' -- VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV -- All Utilities Standard Footer -- VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV -- '''
+sys.modules = og_sys_modules
+''' ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ '''
 if __name__ == '__main__':
     print('In Main:  testing_utils')
-    p_print(['C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts', 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\submodules\\testing_utils', 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\submodules\\file_system_utils', 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\submodules\\logger', 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\submodules\\subprocess_utils', 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\submodules\\exception_utils', 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\..\\..', 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\submodules\\git_tools', 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\submodules\\git_tools', 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\..\\..', 'C:\\Users\\mt204e\\Development\\Eclipse_2019-06\\eclipse\\plugins\\org.python.pydev.core_7.5.0.202001101138\\pysrc', 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts', 'C:\\Users\\mt204e\\AppData\\Local\\Programs\\Python\\Python37-32\\DLLs', 'C:\\Users\\mt204e\\AppData\\Local\\Programs\\Python\\Python37-32\\lib', 'C:\\Users\\mt204e\\AppData\\Local\\Programs\\Python\\Python37-32', 'C:\\Users\\mt204e\\AppData\\Local\\Programs\\Python\\Python37-32\\lib\\site-packages', 'C:\\Users\\mt204e\\AppData\\Local\\Programs\\Python\\Python37-32\\python37.zip'])
+    log_path = "C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\svn_to_git_ip_repo\\test_log.txt"
+#     log_path = "C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\dir_that_does_not_exist\\test_log.txt"
+#     p_print(['C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts', 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\submodules\\testing_utils', 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\submodules\\file_system_utils', 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\submodules\\logger', 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\submodules\\subprocess_utils', 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\submodules\\exception_utils', 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\..\\..', 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\submodules\\git_tools', 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\submodules\\git_tools', 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\..\\..', 'C:\\Users\\mt204e\\Development\\Eclipse_2019-06\\eclipse\\plugins\\org.python.pydev.core_7.5.0.202001101138\\pysrc', 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts', 'C:\\Users\\mt204e\\AppData\\Local\\Programs\\Python\\Python37-32\\DLLs', 'C:\\Users\\mt204e\\AppData\\Local\\Programs\\Python\\Python37-32\\lib', 'C:\\Users\\mt204e\\AppData\\Local\\Programs\\Python\\Python37-32', 'C:\\Users\\mt204e\\AppData\\Local\\Programs\\Python\\Python37-32\\lib\\site-packages', 'C:\\Users\\mt204e\\AppData\\Local\\Programs\\Python\\Python37-32\\python37.zip'])
     
-#     l = '''[FrameInfo(frame=<frame at 0x0414E300, file 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\submodules\\testing_utils\\util_submodules\\exception_utils\\exception_utils.py', line 19, code gat_var_name>, filename='C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\submodules\\testing_utils\\util_submodules\\exception_utils\\exception_utils.py', lineno=19, function='gat_var_name', code_context=["        print('stack: ', inspect.stack())\n"], index=0), FrameInfo(frame=<frame at 0x0413F498, file 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\submodules\\testing_utils\\util_submodules\\exception_utils\\exception_utils.py', line 51, code error_if_forbidden_param_val_combo>, filename='C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\submodules\\testing_utils\\util_submodules\\exception_utils\\exception_utils.py', lineno=51, function='error_if_forbidden_param_val_combo', code_context=["                msg += '\\n' + gat_var_name(param) + ' == ' + str(value)\n"], index=0), FrameInfo(frame=<frame at 0x04C45030, file 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\submodules\\testing_utils\\testing_utlils.py', line 21, code fp_print>, filename='C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\submodules\\testing_utils\\testing_utlils.py', lineno=21, function='fp_print', code_context=['    eu.error_if_forbidden_param_val_combo({log_file_path : None, print_output : False}, reason = "If you arn\'t logging or printing, this function does nothing")\n'], index=0), FrameInfo(frame=<frame at 0x040A6690, file 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\submodules\\testing_utils\\testing_utlils.py', line 70, code <module>>, filename='C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\submodules\\testing_utils\\testing_utlils.py', lineno=70, function='<module>', code_context=["    fp_print(d, title = 'Print Title', log_file_path = None, log_write_mode = 'overwrite', print_indent = 5, json_indent = 4, print_output = False)\n"], index=0), FrameInfo(frame=<frame at 0x0412EAE8, file 'C:\\Users\\mt204e\\Development\\Eclipse_2019-06\\eclipse\\plugins\\org.python.pydev.core_7.5.0.202001101138\\pysrc\\_pydev_imps\\_pydev_execfile.py', line 25, code execfile>, filename='C:\\Users\\mt204e\\Development\\Eclipse_2019-06\\eclipse\\plugins\\org.python.pydev.core_7.5.0.202001101138\\pysrc\\_pydev_imps\\_pydev_execfile.py', lineno=25, function='execfile', code_context=['    exec(compile(contents+"\\n", file, \'exec\'), glob, loc)\n'], index=0), FrameInfo(frame=<frame at 0x03F72CB0, file 'C:\\Users\\mt204e\\Development\\Eclipse_2019-06\\eclipse\\plugins\\org.python.pydev.core_7.5.0.202001101138\\pysrc\\pydevd.py', line 2202, code _exec>, filename='C:\\Users\\mt204e\\Development\\Eclipse_2019-06\\eclipse\\plugins\\org.python.pydev.core_7.5.0.202001101138\\pysrc\\pydevd.py', lineno=2202, function='_exec', code_context=['            pydev_imports.execfile(file, globals, locals)  # execute the script\n'], index=0), FrameInfo(frame=<frame at 0x03E55E30, file 'C:\\Users\\mt204e\\Development\\Eclipse_2019-06\\eclipse\\plugins\\org.python.pydev.core_7.5.0.202001101138\\pysrc\\pydevd.py', line 2195, code run>, filename='C:\\Users\\mt204e\\Development\\Eclipse_2019-06\\eclipse\\plugins\\org.python.pydev.core_7.5.0.202001101138\\pysrc\\pydevd.py', lineno=2195, function='run', code_context=['        return self._exec(is_module, entry_point_fn, module_name, file, globals, locals)\n'], index=0), FrameInfo(frame=<frame at 0x03EF7588, file 'C:\\Users\\mt204e\\Development\\Eclipse_2019-06\\eclipse\\plugins\\org.python.pydev.core_7.5.0.202001101138\\pysrc\\pydevd.py', line 3122, code main>, filename='C:\\Users\\mt204e\\Development\\Eclipse_2019-06\\eclipse\\plugins\\org.python.pydev.core_7.5.0.202001101138\\pysrc\\pydevd.py', lineno=3122, function='main', code_context=["        globals = debugger.run(setup['file'], None, None, is_module)\n"], index=0), FrameInfo(frame=<frame at 0x01652960, file 'C:\\Users\\mt204e\\Development\\Eclipse_2019-06\\eclipse\\plugins\\org.python.pydev.core_7.5.0.202001101138\\pysrc\\pydevd.py', line 3129, code <module>>, filename='C:\\Users\\mt204e\\Development\\Eclipse_2019-06\\eclipse\\plugins\\org.python.pydev.core_7.5.0.202001101138\\pysrc\\pydevd.py', lineno=3129, function='<module>', code_context=['    main()\n'], index=0)]'''.split(', ')
 #     print(len(l))
 #     p_print(l)
 #     
@@ -116,9 +166,16 @@ if __name__ == '__main__':
 #     p_print(d)
 #     
 #     
-    fp_print(d, title = 'Print Title', log_file_path = None, log_write_mode = 'overwrite', print_indent = 5, json_indent = 4, print_output = False)
+#     fp_print(d, title = 'Print Title', log_file_path = log_path, log_write_mode = 'overwrite', print_indent = 5, json_indent = 4, print_output = True)
+#     fp_print("hi this is a string", title = 'Print Title', log_file_path = log_path, log_write_mode = 'append', obj_from_title_indent = 4, print_indent = 5, json_indent = 4, print_output = True)
+#     fp_print("hi this is a string", title = 'Print Title', log_file_path = log_path, log_write_mode = 'append', obj_from_title_indent = 4, print_indent = 5, json_indent = 4, print_output = "sodfnos")
+
+    tp_print(d, "tiltle:")
+    itp_print(d, "tiltle:", 4)
+#     ip_print('hhiasodf', 4)
     
     
+    ma_log(d, 'logging d...', log_path)
     
     
     
