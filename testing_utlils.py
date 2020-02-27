@@ -28,8 +28,8 @@ import json
 # Full Pretty Print
 # if no title given, obj_from_title_indent set to 0
 def fp_print(obj, title = None, log_file_path = None, log_write_mode = 'overwrite', print_indent = 0, obj_from_title_indent = 0, json_indent = 4, print_output = True):
-    eu.error_if_param_type_not_in_whitelist( title                  , ['NoneType', 'str'])
-    eu.error_if_param_type_not_in_whitelist( log_file_path          , ['NoneType', 'str'])
+    eu.error_if_param_type_not_in_whitelist( title                  , ['NoneType' , 'str'])
+    eu.error_if_param_type_not_in_whitelist( log_file_path          , ['NoneType' , 'str'])
     eu.error_if_param_key_not_in_whitelist ( log_write_mode         , ['overwrite', 'append'])    
     eu.error_if_param_type_not_in_whitelist( print_indent           , ['int'])
     eu.error_if_param_type_not_in_whitelist( obj_from_title_indent  , ['int'])
@@ -37,6 +37,33 @@ def fp_print(obj, title = None, log_file_path = None, log_write_mode = 'overwrit
     eu.error_if_param_type_not_in_whitelist( print_output           , ['bool'])
     eu.error_if_forbidden_param_val_combo({log_file_path : None, print_output : False}, reason = "If you arn't logging or printing, this function does nothing")
     
+    
+    
+    # use like: lines = get_func_print_as_line_tup(lambda: p_func("hi", 3))
+    def get_func_print_as_line_tup(func):
+        orig_stdout = sys.stdout
+        f = open(TEMP_FILE_PATH, 'w')
+        sys.stdout = f
+
+        func()
+         
+        sys.stdout = orig_stdout
+        f.close()
+        
+        with open(TEMP_FILE_PATH) as textFile:  # can throw FileNotFoundError
+            line_tup = tuple(l.rstrip() for l in textFile.readlines())
+        
+        os.remove(TEMP_FILE_PATH)
+        
+        return line_tup
+    
+    
+    # if obj or title are functions, reset them as their print outputs
+    if callable(obj):
+        obj   = get_func_print_as_line_tup(obj)
+    if callable(title):
+        title = get_func_print_as_line_tup(title)
+        
     
     if title == None:
         obj_from_title_indent = 0
@@ -48,6 +75,15 @@ def fp_print(obj, title = None, log_file_path = None, log_write_mode = 'overwrit
     
     if title != None:
         out_str += print_indent_str + title + '\n'
+# 
+#         dump = json.dumps(title, indent = json_indent)
+#         dump_line_l = dump.split('\n')
+#          
+#         for line in dump_line_l:
+#             out_str += print_indent_str + line + '\n'
+        
+        
+        
         
     dump = json.dumps(obj, indent = json_indent)
     dump_line_l = dump.split('\n')
@@ -155,10 +191,8 @@ if __name__ == '__main__':
     
     TEMP_FILE_PATH = 'temp.txt'
     
-    # use like: lines = get_func_print_as_str(lambda: p_func("hi", 3))
-    def get_func_print_as_str(func):
-        import sys
-     
+    # use like: lines = get_func_print_as_line_tup(lambda: p_func("hi", 3))
+    def get_func_print_as_line_tup(func):
         orig_stdout = sys.stdout
         f = open(TEMP_FILE_PATH, 'w')
         sys.stdout = f
@@ -185,10 +219,20 @@ if __name__ == '__main__':
             
     p_func("hi", 3)
     
-    str = get_func_print_as_str(lambda: p_func("hi", 3))
+    str = get_func_print_as_line_tup(lambda: p_func("hi", 3))
     
     print('str VVVVVVVVVVVVVVV')
     print(str)
+#     print(type(p_func))
+# 
+#     print(type(p_func) == "<class 'function'>")
+# #     print(str(type(p_func)).split("'")[1] == 'function')
+# 
+#     type_str = str(type(p_func)).split("'")[1]
+#     print(type_str)
+    fp_print(lambda: p_func("hi", 3), title = "TITLE:")#, log_file_path, log_write_mode, print_indent, obj_from_title_indent, json_indent, print_output)
+    
+#     print
     
 # #     log_path = "C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\dir_that_does_not_exist\\test_log.txt"
 # #     p_print(['C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts', 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\submodules\\testing_utils', 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\submodules\\file_system_utils', 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\submodules\\logger', 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\submodules\\subprocess_utils', 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\submodules\\exception_utils', 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\..\\..', 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\submodules\\git_tools', 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\submodules\\git_tools', 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\..\\..', 'C:\\Users\\mt204e\\Development\\Eclipse_2019-06\\eclipse\\plugins\\org.python.pydev.core_7.5.0.202001101138\\pysrc', 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts', 'C:\\Users\\mt204e\\AppData\\Local\\Programs\\Python\\Python37-32\\DLLs', 'C:\\Users\\mt204e\\AppData\\Local\\Programs\\Python\\Python37-32\\lib', 'C:\\Users\\mt204e\\AppData\\Local\\Programs\\Python\\Python37-32', 'C:\\Users\\mt204e\\AppData\\Local\\Programs\\Python\\Python37-32\\lib\\site-packages', 'C:\\Users\\mt204e\\AppData\\Local\\Programs\\Python\\Python37-32\\python37.zip'])
