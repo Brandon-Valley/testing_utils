@@ -152,30 +152,68 @@ sys.modules = og_sys_modules
 if __name__ == '__main__':
     print('In Main:  testing_utils')
     log_path = "C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\svn_to_git_ip_repo\\test_log.txt"
-#     log_path = "C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\dir_that_does_not_exist\\test_log.txt"
-#     p_print(['C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts', 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\submodules\\testing_utils', 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\submodules\\file_system_utils', 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\submodules\\logger', 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\submodules\\subprocess_utils', 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\submodules\\exception_utils', 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\..\\..', 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\submodules\\git_tools', 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\submodules\\git_tools', 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\..\\..', 'C:\\Users\\mt204e\\Development\\Eclipse_2019-06\\eclipse\\plugins\\org.python.pydev.core_7.5.0.202001101138\\pysrc', 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts', 'C:\\Users\\mt204e\\AppData\\Local\\Programs\\Python\\Python37-32\\DLLs', 'C:\\Users\\mt204e\\AppData\\Local\\Programs\\Python\\Python37-32\\lib', 'C:\\Users\\mt204e\\AppData\\Local\\Programs\\Python\\Python37-32', 'C:\\Users\\mt204e\\AppData\\Local\\Programs\\Python\\Python37-32\\lib\\site-packages', 'C:\\Users\\mt204e\\AppData\\Local\\Programs\\Python\\Python37-32\\python37.zip'])
     
-#     print(len(l))
-#     p_print(l)
-#     
-    d = {
-        'A': 1,
-        "b": [1,2,3,4],
-        'v': 3}
-#     
-#     p_print(d)
-#     
-#     
-#     fp_print(d, title = 'Print Title', log_file_path = log_path, log_write_mode = 'overwrite', print_indent = 5, json_indent = 4, print_output = True)
-#     fp_print("hi this is a string", title = 'Print Title', log_file_path = log_path, log_write_mode = 'append', obj_from_title_indent = 4, print_indent = 5, json_indent = 4, print_output = True)
-#     fp_print("hi this is a string", title = 'Print Title', log_file_path = log_path, log_write_mode = 'append', obj_from_title_indent = 4, print_indent = 5, json_indent = 4, print_output = "sodfnos")
+    TEMP_FILE_PATH = 'temp.txt'
+    
+    # use like: lines = get_func_print_as_str(lambda: p_func("hi", 3))
+    def get_func_print_as_str(func):
+        import sys
+     
+        orig_stdout = sys.stdout
+        f = open(TEMP_FILE_PATH, 'w')
+        sys.stdout = f
 
-    tp_print(d, "tiltle:")
-    itp_print(d, "tiltle:", 4)
-#     ip_print('hhiasodf', 4)
+        func()
+         
+        sys.stdout = orig_stdout
+        f.close()
+        
+        with open(TEMP_FILE_PATH) as textFile:  # can throw FileNotFoundError
+            line_tup = tuple(l.rstrip() for l in textFile.readlines())
+        
+        os.remove(TEMP_FILE_PATH)
+        
+        return line_tup
+        
+                
+        
     
+    def p_func(str_to_print, num):
+        for x in range(num):
+            print(str_to_print)
+            
+            
+    p_func("hi", 3)
     
-    ma_log(d, 'logging d...', log_path)
+    str = get_func_print_as_str(lambda: p_func("hi", 3))
+    
+    print('str VVVVVVVVVVVVVVV')
+    print(str)
+    
+# #     log_path = "C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\dir_that_does_not_exist\\test_log.txt"
+# #     p_print(['C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts', 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\submodules\\testing_utils', 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\submodules\\file_system_utils', 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\submodules\\logger', 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\submodules\\subprocess_utils', 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\submodules\\exception_utils', 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\..\\..', 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\submodules\\git_tools', 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\submodules\\git_tools', 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\..\\..', 'C:\\Users\\mt204e\\Development\\Eclipse_2019-06\\eclipse\\plugins\\org.python.pydev.core_7.5.0.202001101138\\pysrc', 'C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts', 'C:\\Users\\mt204e\\AppData\\Local\\Programs\\Python\\Python37-32\\DLLs', 'C:\\Users\\mt204e\\AppData\\Local\\Programs\\Python\\Python37-32\\lib', 'C:\\Users\\mt204e\\AppData\\Local\\Programs\\Python\\Python37-32', 'C:\\Users\\mt204e\\AppData\\Local\\Programs\\Python\\Python37-32\\lib\\site-packages', 'C:\\Users\\mt204e\\AppData\\Local\\Programs\\Python\\Python37-32\\python37.zip'])
+#     
+# #     print(len(l))
+# #     p_print(l)
+# #     
+#     d = {
+#         'A': 1,
+#         "b": [1,2,3,4],
+#         'v': 3}
+# #     
+# #     p_print(d)
+# #     
+# #     
+# #     fp_print(d, title = 'Print Title', log_file_path = log_path, log_write_mode = 'overwrite', print_indent = 5, json_indent = 4, print_output = True)
+# #     fp_print("hi this is a string", title = 'Print Title', log_file_path = log_path, log_write_mode = 'append', obj_from_title_indent = 4, print_indent = 5, json_indent = 4, print_output = True)
+# #     fp_print("hi this is a string", title = 'Print Title', log_file_path = log_path, log_write_mode = 'append', obj_from_title_indent = 4, print_indent = 5, json_indent = 4, print_output = "sodfnos")
+# 
+#     tp_print(d, "tiltle:")
+#     itp_print(d, "tiltle:", 4)
+# #     ip_print('hhiasodf', 4)
+#     
+#     
+#     ma_log(d, 'logging d...', log_path)
     
     
     
