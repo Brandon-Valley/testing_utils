@@ -28,7 +28,6 @@ import json
 # Full Pretty Print
 # if no title given, obj_from_title_indent set to 0
 def fp_print(obj, title = None, log_file_path = None, log_write_mode = 'overwrite', print_indent = 0, obj_from_title_indent = 0, json_indent = 4, print_output = True):
-    eu.error_if_param_type_not_in_whitelist( title                  , ['NoneType' , 'str'])
     eu.error_if_param_type_not_in_whitelist( log_file_path          , ['NoneType' , 'str'])
     eu.error_if_param_key_not_in_whitelist ( log_write_mode         , ['overwrite', 'append'])    
     eu.error_if_param_type_not_in_whitelist( print_indent           , ['int'])
@@ -64,7 +63,8 @@ def fp_print(obj, title = None, log_file_path = None, log_write_mode = 'overwrit
     if callable(title):
         title = get_func_print_as_line_tup(title)
         
-    
+        
+    # indents
     if title == None:
         obj_from_title_indent = 0
     
@@ -73,27 +73,27 @@ def fp_print(obj, title = None, log_file_path = None, log_write_mode = 'overwrit
     
     out_str = ''
     
+    # add title to out_str
     if title != None:
-        out_str += print_indent_str + title + '\n'
-# 
-#         dump = json.dumps(title, indent = json_indent)
-#         dump_line_l = dump.split('\n')
-#          
-#         for line in dump_line_l:
-#             out_str += print_indent_str + line + '\n'
+        dump = json.dumps(title, indent = json_indent)
+        dump_line_l = dump.split('\n')
+          
+        for line in dump_line_l:
+            out_str += print_indent_str + line + '\n'
         
         
-        
-        
+    # add obj to out_str   
     dump = json.dumps(obj, indent = json_indent)
     dump_line_l = dump.split('\n')
     
     for line in dump_line_l:
         out_str += print_indent_str + obj_from_title_indent_str + line + '\n'
         
+    # log file if needed
     if log_file_path != None:
         txt_logger.write(out_str, log_file_path, write_mode = log_write_mode)
         
+    # print if needed
     if print_output:
         print(out_str)
         
@@ -230,7 +230,8 @@ if __name__ == '__main__':
 # 
 #     type_str = str(type(p_func)).split("'")[1]
 #     print(type_str)
-    fp_print(lambda: p_func("hi", 3), title = "TITLE:")#, log_file_path, log_write_mode, print_indent, obj_from_title_indent, json_indent, print_output)
+    fp_print(lambda: p_func("hi", 3), title = lambda: p_func("bro", 3))#, log_file_path, log_write_mode, print_indent, obj_from_title_indent, json_indent, print_output)
+    tp_print(lambda: p_func("hi", 3), title = lambda: p_func("bro", 3))#, log_file_path, log_write_mode, print_indent, obj_from_title_indent, json_indent, print_output)
     
 #     print
     
