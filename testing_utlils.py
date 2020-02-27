@@ -27,6 +27,7 @@ import json
     
 # Full Pretty Print
 # if no title given, obj_from_title_indent set to 0
+# passing func as obj or title Ex:  fp_print((lambda: p_func("hi", 3))
 def fp_print(obj, title = None, log_file_path = None, log_write_mode = 'overwrite', print_indent = 0, obj_from_title_indent = 0, json_indent = 4, print_output = True):
     eu.error_if_param_type_not_in_whitelist( log_file_path          , ['NoneType' , 'str'])
     eu.error_if_param_key_not_in_whitelist ( log_write_mode         , ['overwrite', 'append'])    
@@ -37,8 +38,7 @@ def fp_print(obj, title = None, log_file_path = None, log_write_mode = 'overwrit
     eu.error_if_forbidden_param_val_combo({log_file_path : None, print_output : False}, reason = "If you arn't logging or printing, this function does nothing")
     
     
-    
-    # use like: lines = get_func_print_as_line_tup(lambda: p_func("hi", 3))
+    # Ex: lines = get_func_print_as_line_tup(lambda: p_func("hi", 3))
     def get_func_print_as_line_tup(func):
         orig_stdout = sys.stdout
         f = open(TEMP_FILE_PATH, 'w')
