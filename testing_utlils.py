@@ -24,6 +24,9 @@ import json
 
 
 
+TEMP_FILE_PATH = 'temp.txt'
+
+
     
 # Full Pretty Print
 # if no title given, obj_from_title_indent set to 0
@@ -56,12 +59,19 @@ def fp_print(obj, title = None, log_file_path = None, log_write_mode = 'overwrit
         
         return line_tup
     
-    
+
+#     
     # if obj or title are functions, reset them as their print outputs
+    # treat single line printed outputs of functions like strings, not lists
     if callable(obj):
         obj   = get_func_print_as_line_tup(obj)
+        if len(obj) == 1:
+            obj = obj[0]
     if callable(title):
         title = get_func_print_as_line_tup(title)
+        if len(title) == 1:
+            title = title[0]
+#         print(' in testing utils, title after convert:  ', title)#``````````````````````````````````````````````````````````````````````````````
         
         
     # indents
@@ -76,7 +86,10 @@ def fp_print(obj, title = None, log_file_path = None, log_write_mode = 'overwrit
     # add title to out_str
     if title != None:
         dump = json.dumps(title, indent = json_indent)
+#         print('title dump: ', dump)#`````````````````````````````````````````````````````````````````````
         dump_line_l = dump.split('\n')
+#         print('title dump_line_l: ', dump_line_l)#`````````````````````````````````````````````````````````````````````
+
           
         for line in dump_line_l:
             out_str += print_indent_str + line + '\n'
@@ -232,7 +245,7 @@ if __name__ == '__main__':
 #     print(type_str)
     fp_print(lambda: p_func("hi", 3), title = lambda: p_func("bro", 3))#, log_file_path, log_write_mode, print_indent, obj_from_title_indent, json_indent, print_output)
     tp_print(lambda: p_func("hi", 3), title = lambda: p_func("bro", 3))#, log_file_path, log_write_mode, print_indent, obj_from_title_indent, json_indent, print_output)
-    
+    ta_log(lambda: p_func("hi", 3), title = lambda: p_func("bro", 3), log_file_path = "C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\bitbucket_repo_setup_scripts\\repo_transfer_out.txt")
 #     print
     
 # #     log_path = "C:\\Users\\mt204e\\Documents\\projects\\Bitbucket_repo_setup\\dir_that_does_not_exist\\test_log.txt"
