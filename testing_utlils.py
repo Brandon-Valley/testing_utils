@@ -44,7 +44,15 @@ def fp_print(obj, title = None, log_file_path = None, log_write_mode = 'overwrit
     # Ex: lines = get_func_print_as_line_tup(lambda: p_func("hi", 3))
     def get_func_print_as_line_tup(func):
         orig_stdout = sys.stdout
-        f = open(TEMP_FILE_PATH, 'w')
+
+        # sometimes will get PermissionError: [Errno 13] Permission denied: 'temp.txt' on VVV, maybe because things going too fast?
+        try:    
+            f = open(TEMP_FILE_PATH, 'w')
+        except(PermissionError):
+            if os.path.exists(TEMP_FILE_PATH):
+                os.remove(TEMP_FILE_PATH)
+            f = open(TEMP_FILE_PATH, 'w')
+            
         sys.stdout = f
 
         func()
