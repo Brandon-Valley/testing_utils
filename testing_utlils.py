@@ -26,7 +26,9 @@ import json
 
 TEMP_FILE_PATH = 'temp.txt'
 
-
+def e_print(*args, **kwargs):
+    print(*args, file=sys.stderr, **kwargs)
+    
     
 # Full Pretty Print
 # if no title given, obj_from_title_indent set to 0
